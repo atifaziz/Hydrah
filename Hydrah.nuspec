@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>Hydrah</id>
+        <version>1.0.0$VersionSuffix$</version>
+        <title>Generic Serivce Pool</title>
+        <authors>Atif Aziz</authors>
+        <owners>Atif Aziz</owners>
+        <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+        <projectUrl>https://github.com/atifaziz/Hydrah</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>.NET Portable Class Library for generic service pooling.</description>
+        <copyright>Copyright &#169; 2015 Atif Aziz. All rights reserved.</copyright>
+        <tags></tags>
+        <dependencies>
+            <dependency id="Interlocker" version="1.1.0" />
+            <dependency id="MoreLinq.Portable" version="1.4.0" />
+            <dependency id="Rx-Main" version="2.2.5" />
+            <dependency id="Worms" version="1.0.0-alpha-20151105T2316" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="COPYING.txt" target="COPYING.txt" />
+        <file src="bin\Release\*" target="lib\portable-net45+win+MonoAndroid10+xamarinios10+MonoTouch10" />
+        <file src="src\**.cs" target="src" />
+    </files>
+</package>
