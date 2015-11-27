@@ -38,7 +38,6 @@
     <Compile Include="App_Packages\AngryArrays\AngryArrays.cs" />
     <Compile Include="Arrays.cs" />
     <Compile Include="Cleaner.cs" />
-    <Compile Include="FaultedTask.cs" />
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Mannex.cs" />
     <Compile Include="Pool.cs" />

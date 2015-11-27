@@ -26,28 +26,5 @@ namespace Hydrah
             if (task == null) throw new ArgumentNullException(nameof(task));
             return task.Status == TaskStatus.RanToCompletion;
         }
-
-        public static Task<bool> OrTimeout(this Task task, TimeSpan timeout) =>
-            OrTimeout(task, timeout, false, _ => true);
-
-        public static Task<T> OrTimeout<T>(this Task<T> task, TimeSpan timeout) =>
-            task.OrTimeout(timeout, default(T), t => t.Result);
-
-        public static async Task<TResult> OrTimeout<T, TResult>(this T task,
-            TimeSpan timeout, TResult timeoutResult, Func<T, TResult> resultSelector)
-            where T : Task
-        {
-            if (task == null) throw new ArgumentNullException(nameof(task));
-            if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
-
-            var timeoutTask = Task.Delay(timeout);
-            var winner = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
-            if (winner == timeoutTask)
-            {
-                task.IgnoreFault();
-                return timeoutResult;
-            }
-            return resultSelector(task);
-        }
     }
 }
