@@ -27,13 +27,14 @@ methods, one to describe how to start a service and another to stop it:
     public abstract class Controller<TSetup, TService>
     {
         public abstract Task<TResult> Start<TResult>(TSetup setup,
+            CancellationToken cancellationToken,
             Func<TService, Task, TResult> selector);
         public abstract Task Shutdown(TService service, bool force = false);
     }
 
 `Start` takes an instance of `TSetup` and uses it to launch and initialize
 a service asynchronously. That service then joins the pool once it is ready,
-when the `Task` object returned by `Start` completes. The second parameter
+when the `Task` object returned by `Start` completes. The last parameter
 of `Start` is a projection callback. Once the service is ready to be added
 to the pool, `Start` supplies the callback with the instance of the service
 and a `Task` object that acts as a stop signal. If this task object completes

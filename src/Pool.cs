@@ -56,7 +56,9 @@ namespace Hydrah
 
     public abstract class Controller<TSetup, TService>
     {
-        public abstract Task<TResult> Start<TResult>(TSetup setup, Func<TService, Task, TResult> selector);
+        public Task<TResult> Start<TResult>(TSetup setup, Func<TService, Task, TResult> selector) =>
+            Start(setup, CancellationToken.None, selector);
+        public abstract Task<TResult> Start<TResult>(TSetup setup, CancellationToken cancellationToken, Func<TService, Task, TResult> selector);
         public abstract Task Shutdown(TService service, bool force = false);
         public virtual string Format(TSetup setup) => $"{setup}";
         public virtual string Format(TService service) => $"{service}";
@@ -289,7 +291,7 @@ namespace Hydrah
                                 .Select(setup => new { PoolId  = poolId,
                                                        Setup   = setup,
                                                        // TODO Handle Start throwing
-                                                       Task    = controller.Start(setup, (s, t) => new { Service = s, StopSignal = t }) })
+                                                       Task    = controller.Start(setup, cancellationToken, (s, t) => new { Service = s, StopSignal = t }) })
                                 .ToList();
             var defaultFailure = new { Setup = default(TSetup), Exception = default(AggregateException) };
             var failures = Enumerable.Repeat(defaultFailure, 0).ToList();
@@ -318,14 +320,14 @@ namespace Hydrah
                         TSetup setup;
                         rsts.Add(new { PoolId = poolId,
                                        Setup  = setup = setupList.Shift(),
-                                       Task   = controller.Start(setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                       Task   = controller.Start(setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                     }
 
                     if (rst.Task.IsFaulted)
                     {
                         if (rst.PoolId != poolId)
                             rsts.Add(new { PoolId = poolId, rst.Setup,
-                                           Task = controller.Start(rst.Setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                           Task = controller.Start(rst.Setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                         else
                             failures.Add(new { rst.Setup, rst.Task.Exception });
                     }
@@ -348,7 +350,7 @@ namespace Hydrah
                             rsts.AddRange(from setup in setupList.Shift(hydrationRate - rsts.Count)
                                           select new { PoolId = poolId,
                                                        Setup  = setup,
-                                                       Task   = controller.Start(setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                                       Task   = controller.Start(setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                         }
                     }
                     return cont.Result;
@@ -387,7 +389,7 @@ namespace Hydrah
                         rsts.AddRange(from setup in setupList.Shift(hydrationRate - rsts.Count)
                                       select new { PoolId = poolId,
                                                    Setup  = setup,
-                                                   Task   = controller.Start(setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                                   Task   = controller.Start(setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                         return true;
                     })
                     .WhenAny(leases.Select(l => l.Task), async leaseReturnTask =>
@@ -431,7 +433,7 @@ namespace Hydrah
                             rsts.AddRange(from setup in setupList.Shift(hydrationRate - rsts.Count)
                                           select new { PoolId = poolId,
                                                        Setup  = setup,
-                                                       Task   = controller.Start(setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                                       Task   = controller.Start(setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                         }
                         else
                         {
@@ -490,7 +492,7 @@ namespace Hydrah
                             rsts.AddRange(from setup in setupList.Shift(hydrationRate - rsts.Count)
                                           select new { PoolId = poolId,
                                                        Setup  = setup,
-                                                       Task   = controller.Start(setup, (s, ss) => new { Service = s, StopSignal = ss }) });
+                                                       Task   = controller.Start(setup, cancellationToken, (s, ss) => new { Service = s, StopSignal = ss }) });
                         }
 
                         return cont;
