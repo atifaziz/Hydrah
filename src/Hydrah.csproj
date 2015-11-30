@@ -36,6 +36,7 @@
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
     <Compile Include="App_Packages\AngryArrays\AngryArrays.cs" />
+    <Compile Include="App_Packages\Interlocker\Interlocked.cs" />
     <Compile Include="Arrays.cs" />
     <Compile Include="Cleaner.cs" />
     <Compile Include="ListExtensions.cs" />
@@ -49,10 +50,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Interlocker, Version=1.1.18928.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Interlocker.1.1.0\lib\portable-net40+win+wpa81\Interlocker.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="MoreLinq.Portable, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
       <HintPath>..\packages\MoreLinq.Portable.1.4.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\MoreLinq.Portable.dll</HintPath>
       <Private>True</Private>
