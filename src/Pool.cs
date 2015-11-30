@@ -41,19 +41,6 @@ namespace Hydrah
 
     #endregion
 
-    class ResourceSetupResult<T>
-    {
-        public T    Service    { get; }
-        public Task StopSignal { get; }
-
-        public ResourceSetupResult(T service, Task stopSignal)
-        {
-            if (stopSignal == null) throw new ArgumentNullException(nameof(stopSignal));
-            Service    = service;
-            StopSignal = stopSignal;
-        }
-    }
-
     public abstract class Controller<TSetup, TService>
     {
         public Task<TResult> Start<TResult>(TSetup setup, Func<TService, Task, TResult> selector) =>
