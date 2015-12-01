@@ -215,7 +215,7 @@ namespace Hydrah
         readonly AutoResetEvent _restartEvent = new AutoResetEvent();
         readonly AutoResetEvent _event = new AutoResetEvent();
 
-        public Pool()
+        Pool()
         {
             _state = Interlocked.Create(new State());
 
