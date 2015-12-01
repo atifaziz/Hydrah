@@ -208,6 +208,7 @@ namespace Hydrah
             public static Tuple<State, T> NullAndWith<T>(T value) => Tuple.Create((State)null, value);
         }
 
+        readonly CancellationTokenSource _cancellationTokenSource;
         readonly Semaphore _semaphore = new Semaphore(0);
         readonly IEnumerator<int> _poolIds = MoreEnumerable.Generate(1, id => id + 1).GetEnumerator();
         readonly Interlocked<State> _state;
@@ -215,8 +216,12 @@ namespace Hydrah
         readonly AutoResetEvent _restartEvent = new AutoResetEvent();
         readonly AutoResetEvent _event = new AutoResetEvent();
 
-        Pool()
+        Pool(CancellationTokenSource cancellationTokenSource)
         {
+            Debug.Assert(cancellationTokenSource != null);
+
+            _cancellationTokenSource = cancellationTokenSource;
+
             _state = Interlocked.Create(new State());
 
             ObservableStats = Observable
@@ -262,8 +267,9 @@ namespace Hydrah
         public static Pool<TSetup, TService> Start(IEnumerable<TSetup> configs, Controller<TSetup, TService> controller,
             CancellationToken cancellationToken)
         {
-            var pool = new Pool<TSetup, TService>();
-            pool.Task = pool.StartCore(configs, controller, cancellationToken);
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var pool = new Pool<TSetup, TService>(cts);
+            pool.Task = pool.StartCore(configs, controller, cts.Token);
             return pool;
         }
 
@@ -498,6 +504,12 @@ namespace Hydrah
             await Task.WhenAll(fst.Servers.Concat(fst.Leases.Select(l => l.Member))
                                           .Select(rsv => controller.Shutdown(rsv.Service)))
                       .ConfigureAwait(false);
+        }
+
+        public async Task Stop()
+        {
+            _cancellationTokenSource.Cancel();
+            await Task;
         }
 
         public void Restart() => _restartEvent.Set();
